@@ -4,12 +4,19 @@ import { getCoordinates } from "../api/get/coordinates";
 import {
   CordinatesData,
   UseCordinatesResult,
+  LocationItem,
 } from "../interfaces/codinatesResult";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 const useCordinate = (location: string): UseCordinatesResult => {
   const [data, setData] = useState<CordinatesData[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
+
+  const dataDestinations = useSelector(
+    (state: RootState) => state.destinations
+  );
 
   const debouncedFetchData = debounce(async (location: string) => {
     try {
@@ -18,7 +25,15 @@ const useCordinate = (location: string): UseCordinatesResult => {
       const onlyCity = result.filter(
         (item: any) => item.result_type === "city"
       );
-      setData(onlyCity); // onlyCity es un array de CordinatesData
+
+      const filteredCities = onlyCity.filter(
+        (city: CordinatesData) =>
+          !dataDestinations.some(
+            (destination: LocationItem) => destination.id === city.id
+          )
+      );
+
+      setData(filteredCities);
     } catch (err) {
       setError(err as Error);
     } finally {
@@ -33,7 +48,13 @@ const useCordinate = (location: string): UseCordinatesResult => {
     }
   }, [location]);
 
-  return { data, loading, error };
+  const reset = () => {
+    setData(null);
+    setLoading(true);
+    setError(null);
+  };
+
+  return { data, loading, error, reset };
 };
 
 export default useCordinate;

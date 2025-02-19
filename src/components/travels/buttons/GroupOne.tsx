@@ -4,19 +4,34 @@ import React from "react";
 export default function ButtonsGroupOne() {
   return (
     <View style={styles.buttonsGroupOne}>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Viajes</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          borderLeftWidth: 1,
-        }}
+      <View
+        style={[
+          styles.button,
+          {
+            // backgroundColor: "#458C26",
+            borderBottomLeftRadius: 15,
+            borderTopLeftRadius: 15,
+          },
+        ]}
       >
-        <Text style={styles.buttonText}>Clima</Text>
-      </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.buttonText}>Viajes</Text>
+        </TouchableOpacity>
+      </View>
+      <View
+        style={[
+          styles.button,
+          {
+            backgroundColor: "#68D239",
+            borderTopRightRadius: 15,
+            borderBottomRightRadius: 15,
+          },
+        ]}
+      >
+        <TouchableOpacity>
+          <Text style={styles.buttonText}>Clima</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -29,13 +44,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#000",
     alignItems: "center",
-    // justifyContent: "space-around",
-    padding: 10,
+    justifyContent: "space-around",
   },
   button: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    width: "50%",
+    paddingVertical: 5,
   },
 
   buttonText: {

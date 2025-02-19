@@ -11,9 +11,13 @@ import {
   TextInputChangeEventData,
   FlatList,
 } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
 import useCordinate from "../../hooks/useCordinates";
 import { CordinatesData } from "../../interfaces/codinatesResult";
-
+import { addLocation } from "../../redux/destinationsSlider";
+import { RootState } from "../../redux/store";
+import { incrementColorIndex } from "../../redux/colorsSlider";
+import weatherForeCast from "../../api/get/weatherForeCast";
 interface SlideModalProps {
   isVisible: boolean;
   onClose: () => void;
@@ -21,17 +25,47 @@ interface SlideModalProps {
 
 const SlideModal: React.FC<SlideModalProps> = ({ isVisible, onClose }) => {
   const [location, setLocation] = useState<string>("");
-  const { data, loading, error } = useCordinate(location);
-  const [selectedCity, setSelectedCity] = useState<CordinatesData>({
-    temperature: 0,
-    condition: "",
-    city_name: "",
-    state: "",
-    lat: "",
-    long: "",
-  });
+  const { data, loading, error, reset } = useCordinate(location);
 
-  console.log("SELECTED CITY:", selectedCity);
+  const dispatch = useDispatch();
+  const dataDestinations = useSelector(
+    (state: RootState) => state.destinations
+  );
+
+  const colorIndex = useSelector((state: RootState) => state.colors.colorIndex);
+
+  const colors = ["#FF0000", "#FFFF00", "#008000", "#0000FF", "#FFC0CB"]; // rojo, amarillo, verde, azul, rosa
+
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  const handleSelectCity = async (city: CordinatesData) => {
+    onClose();
+    dispatch(
+      addLocation({
+        id: city.id,
+        name: city.city_name,
+        state: city.state,
+        country: city.country,
+        lat: city.lat,
+        long: city.long,
+        color: getRandomColor(),
+      })
+    );
+    setLocation("");
+    reset();
+    dispatch(incrementColorIndex());
+
+    await weatherForeCast(city.lat, city.long).then((res) => {
+      console.log("REEES:", res);
+    });
+  };
 
   const slideAnim = new Animated.Value(0);
 
@@ -84,34 +118,14 @@ const SlideModal: React.FC<SlideModalProps> = ({ isVisible, onClose }) => {
           />
 
           <Text style={styles.sectionTitle}>DESTINOS POPULARES</Text>
-          {/* <Picker
-            selectedValue={selectedCity}
-            onValueChange={(itemValue: string) => setSelectedCity(itemValue)}
-            style={styles.picker}
-          >
-            {data &&
-              data.map((cityData, index) => (
-                <Picker.Item
-                  key={index}
-                  label={cityData.city_name}
-                  value={cityData.city_name}
-                />
-              ))}
-          </Picker> */}
+
           <FlatList
             data={data}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedCity(item);
-                  onClose();
-                }}
-              >
+              <TouchableOpacity onPress={() => handleSelectCity(item)}>
                 <Text style={styles.citiesItem}>
-                  {item.city_name}
-                  {", "}
-                  {item.state}
+                  {`${item.city_name}, ${item.state}, ${item.country}`}
                 </Text>
               </TouchableOpacity>
             )}

@@ -8,17 +8,23 @@ const newDays = getNext7Days();
 const WeatherGraph = () => {
   const place1Temps = [25, 28, 30, 32, 29, 27, 26]; // Temperatures for Place 1
   const place2Temps = [22, 24, 26, 28, 27, 25, 23]; // Temperatures for Place 2
+  const place3Temps = [10, -3, 2, 8, 7, 5, 13]; // Temperatures for Place 2
 
   const data = {
     labels: newDays, // X-axis labels (days)
     datasets: [
       {
-        data: place1Temps, // Y-axis data for Place 1
-        color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`, // Red line for Place 1
+        data: place1Temps,
+        color: () => `#68D239`, // Red line for Place 1
         strokeWidth: 2, // Line thickness
       },
       {
-        data: place2Temps, // Y-axis data for Place 2
+        data: place2Temps,
+        color: (opacity = 1) => `rgba(104, 210, 57, ${opacity})`, // Blue line for Place 2
+        strokeWidth: 2, // Line thickness
+      },
+      {
+        data: place3Temps,
         color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`, // Blue line for Place 2
         strokeWidth: 2, // Line thickness
       },
@@ -44,9 +50,9 @@ const WeatherGraph = () => {
             borderRadius: 16,
           },
           propsForDots: {
-            r: "4", // Dot radius
-            strokeWidth: "2",
-            stroke: "#ffa726",
+            r: "4",
+            // strokeWidth: "1",
+            // stroke: "#ffa726",
           },
         }}
         bezier // Smooth line curve
